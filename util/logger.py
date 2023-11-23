@@ -21,7 +21,7 @@ logger.addHandler(file_handler)
 
 def logger_init(input_folder, output_folder, name):
     logging.basicConfig(level=logging.DEBUG)
-    logger2 = logging.getLogger('my_app2')
+    logger2 = logging.getLogger('init_log')
     file_handler2 = logging.FileHandler('app.log')
     file_handler2.setLevel(logging.DEBUG)
     logger2.addHandler(file_handler2)

@@ -5,6 +5,7 @@
 # @File    : data.py
 # @Software: PyCharm
 import os
+
 from util.logger import logger
 
 IMG_EXTENSIONS = [".jpg", ".JPG",
@@ -17,7 +18,7 @@ def make_dataset(dir):
     logger.info('处理数据集...')
     assert os.path.isdir(dir), "%s 不是一个合法的文件夹路径" % dir
     for fname in sorted(os.listdir(dir)):
-        print(fname)
+        # print(fname, end='\n')
         if is_image(fname):
             path = os.path.join(dir, fname)
             fname = fname.split(".")[0]

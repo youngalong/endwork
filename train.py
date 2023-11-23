@@ -5,14 +5,6 @@
 # @File    : train.py
 # @Software: PyCharm
 
-#
-
-
-# def main():
-#     config.name = name
-#     files = make_dataset(input_folder)
-#     print(files)
-
 import click
 
 from config import config
@@ -29,7 +21,7 @@ def main(input_folder, output_folder, username):
 
     config.name = username
     files = make_dataset(input_folder)
-    print(files)
+    # print(files)
 
 
 if __name__ == '__main__':
