@@ -13,14 +13,14 @@ IMG_EXTENSIONS = [".jpg", ".JPG",
                   ".jpeg", ".JPEG"]
 
 
-def make_dataset(dir):
+def make_dataset(dir_path):
     images = []
     logger.info('处理数据集...')
-    assert os.path.isdir(dir), "%s 不是一个合法的文件夹路径" % dir
-    for fname in sorted(os.listdir(dir)):
+    assert os.path.isdir(dir_path), "%s 不是一个合法的文件夹路径" % dir_path
+    for fname in sorted(os.listdir(dir_path)):
         # print(fname, end='\n')
         if is_image(fname):
-            path = os.path.join(dir, fname)
+            path = os.path.join(dir_path, fname)
             fname = fname.split(".")[0]
             images.append((fname, path))
     return images

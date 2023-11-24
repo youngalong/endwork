@@ -6,3 +6,7 @@
 # @Software: PyCharm
 
 name = ""
+image_size = 1024
+
+# 预训练模型
+shape_predictor_path = 'autodl-tmp/pretrained_models/shape_predictor_68_face_landmarks.dat'
