@@ -9,13 +9,13 @@ import dlib
 import numpy as np
 import scipy
 import scipy.ndimage
-import skimage.io as io
 from PIL import Image
 from scipy.ndimage import gaussian_filter1d
 from tqdm import tqdm
 
 from config.config import image_size
 from config.config import shape_predictor_path
+from util.logger import logger
 
 
 def crop_face(files, scale, center_sigma=0.0, xy_sigma=0.0):
@@ -27,14 +27,13 @@ def crop_face(files, scale, center_sigma=0.0, xy_sigma=0.0):
     :param xy_sigma:
     :return: crops 裁剪后图片; orig_images 原始图片; quads 200 * 4 * 2 裁剪坐标
     """
-    fa = None
     predictor = dlib.shape_predictor(shape_predictor_path)
     detector = dlib.get_frontal_face_detector()
 
     cs, xs, ys = [], [], []
+    logger.info('检测人脸...')
     for _, path in tqdm(files):
-        c, x, y = compute_transform(path, predictor, detector=detector,
-                                    scale=scale, fa=fa)
+        c, x, y = compute_transform(path, predictor, detector=detector, scale=scale)
         cs.append(c)
         xs.append(x)
         ys.append(y)
@@ -57,8 +56,8 @@ def crop_face(files, scale, center_sigma=0.0, xy_sigma=0.0):
     return crops, orig_images, quads
 
 
-def compute_transform(filepath, predictor, detector=None, scale=1.0, fa=None):
-    lm = get_landmark(filepath, predictor, detector, fa)
+def compute_transform(filepath, predictor, detector=None, scale=1.0):
+    lm = get_landmark(filepath, predictor, detector)
     if lm is None:
         raise Exception(f'Did not detect any faces in image: {filepath}')
     lm_chin = lm[0: 17]  # left-right
@@ -90,17 +89,10 @@ def compute_transform(filepath, predictor, detector=None, scale=1.0, fa=None):
     return c, x, y
 
 
-def get_landmark(filepath, predictor, detector=None, fa=None):
+def get_landmark(filepath, predictor, detector=None):
     """get landmark with dlib
     :return: np.array shape=(68, 2)
     """
-    if fa is not None:
-        image = io.imread(filepath)
-        lms, _, bboxes = fa.get_landmarks(image, return_bboxes=True)
-        if len(lms) == 0:
-            return None
-        return lms[0]
-
     if detector is None:
         detector = dlib.get_frontal_face_detector()
     if isinstance(filepath, PIL.Image.Image):
@@ -174,6 +166,7 @@ def crop_image(filepath, output_size, quad, enable_padding=False):
 def crop_faces_by_quads(files, quads):
     orig_images = []
     crops = []
+    logger.info('裁剪图片...')
     for quad, (_, path) in tqdm(zip(quads, files), total=len(quads)):
         crop = crop_image(path, image_size, quad.copy())
         orig_image = Image.open(path)
