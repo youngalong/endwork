@@ -6,8 +6,11 @@
 # @Software: PyCharm
 
 import click
+from torchvision import transforms
 
 from config import config
+from dataset.my_dataset import MyDataset
+from training.coach import Coach
 from util.alignment import crop_face
 from util.data import make_dataset
 from util.logger import logger
@@ -21,8 +24,9 @@ from util.logger import logger_init
 @click.option('--scale', default=1.0, type=float)
 @click.option('--center_sigma', type=float, default=1.0)
 @click.option('--xy_sigma', type=float, default=3.0)
-def main(input_folder, output_folder, username, scale, center_sigma, xy_sigma):
-    logger_init(input_folder, output_folder, username, scale)
+@click.option('--encoder', help='潜码编码器', type=str, required=True)
+def main(input_folder, output_folder, username, scale, center_sigma, xy_sigma, encoder):
+    logger_init(input_folder, output_folder, username, scale, encoder)
 
     config.name = username
     files = make_dataset(input_folder)
@@ -34,6 +38,17 @@ def main(input_folder, output_folder, username, scale, center_sigma, xy_sigma):
 
     # crops[0].save('crops.jpg')
     # orig_images[0].save('orig_images.jpg')
+
+    # ds = ImageListDataset(crops, transforms.Compose([
+    #     transforms.ToTensor(),
+    #     transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])]))
+    ds = MyDataset(crops, transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
+    ]))
+    coach = Coach(ds, encoder)
+
+    logger.info(coach.encoder_net)
 
 
 if __name__ == '__main__':

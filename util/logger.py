@@ -19,7 +19,7 @@ file_handler.setFormatter(file_formatter)
 logger.addHandler(file_handler)
 
 
-def logger_init(input_folder, output_folder, name, scale):
+def logger_init(input_folder, output_folder, name, scale, encoder):
     logging.basicConfig(level=logging.DEBUG)
     logger2 = logging.getLogger('init_log')
     file_handler2 = logging.FileHandler('train.log')
@@ -32,6 +32,7 @@ def logger_init(input_folder, output_folder, name, scale):
     logger2.info('** output_folder: %s                                                        ', output_folder)
     logger2.info('** name: %s                                                                 ', name)
     logger2.info('** scale: %s                                                                ', scale)
+    logger2.info('** encoder: %s                                                              ', encoder)
     logger2.info('****************************************************************************')
     logger2.info('')
 
