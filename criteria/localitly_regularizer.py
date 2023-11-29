@@ -54,6 +54,6 @@ class SpaceRegularizer:
 
         return loss / len(territory_indicator_ws)
 
-    def space_regularizer_loss(self, new_G, w_batch, log_name, use_wandb):
-        ret_val = self.ball_holder_loss_lazy(new_G, latent_ball_num_of_samples, w_batch, log_name, use_wandb)
+    def space_regularizer_loss(self, new_G, w_batch, log_name):
+        ret_val = self.ball_holder_loss_lazy(new_G, latent_ball_num_of_samples, w_batch, log_name)
         return ret_val
