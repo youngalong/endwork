@@ -48,6 +48,10 @@ def main(input_folder, output_folder, username, scale, center_sigma, xy_sigma, e
     ]))
     coach = Coach(ds, encoder)
 
+    ws = coach.train()
+
+    logger.info(ws)
+
 
 if __name__ == '__main__':
     main()

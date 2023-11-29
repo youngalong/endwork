@@ -4,10 +4,13 @@
 # @Author  : youngalone
 # @File    : config.py
 # @Software: PyCharm
+import torch
 
 name = ""
 image_size = 1024
+device = "cuda:0" if torch.cuda.is_available else "cpu"
 checkpoints_dir = './checkpoints'
+training_step = 1
 
 # 预训练模型
 shape_predictor_path = 'autodl-tmp/pretrained_models/shape_predictor_68_face_landmarks.dat'
@@ -20,3 +23,12 @@ regularizer_alpha = 30
 regularizer_l2_lambda = 0.1
 regularizer_lpips_lambda = 0.1
 latent_ball_num_of_samples = 1
+locality_regularization_interval = 1
+use_locality_regularization = True
+
+# LOSS
+pt_l2_lambda = 1
+pt_lpips_lambda = 1
+
+first_inv_steps = 50
+max_pti_steps = 50
