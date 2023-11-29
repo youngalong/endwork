@@ -14,7 +14,8 @@ class MyDataset(Dataset):
 
     def __getitem__(self, index):
         image = self.images[index]
+        name = str(index)
         image = image.convert('RGB')
         image = self.transform(image)
 
-        return image
+        return name, image

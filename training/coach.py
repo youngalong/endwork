@@ -8,7 +8,6 @@ import os
 from collections import defaultdict
 
 import torch
-import numpy as np
 
 from lpips import LPIPS
 from torchvision import transforms
