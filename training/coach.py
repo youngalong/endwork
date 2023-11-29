@@ -143,3 +143,9 @@ class Coach:
         generated_images = self.G.synthesis(w, noise_mode='const', force_fp32=True)
 
         return generated_images
+
+    def configure_optimizers(self):
+        optimizer = torch.optim.Adam(self.G.parameters(), betas=(config.pti_adam_beta1, 0.999),
+                                     lr=config.pti_learning_rate)
+
+        return optimizer

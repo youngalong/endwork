@@ -32,3 +32,7 @@ pt_lpips_lambda = 1
 
 first_inv_steps = 50
 max_pti_steps = 50
+
+# 优化器
+pti_adam_beta1 = 0.9
+pti_learning_rate = 3e-5
