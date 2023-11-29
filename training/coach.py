@@ -19,7 +19,7 @@ from config.config import checkpoints_dir
 from criteria import l2_loss
 from criteria.localitly_regularizer import SpaceRegularizer
 from models.utils import init_e4e, load_old_g
-from util import logger
+from util.logger import logger
 
 
 class Coach:
