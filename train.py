@@ -33,7 +33,11 @@ from util.logger import logger_init
 @click.option('--center_sigma', type=float, default=1.0)
 @click.option('--xy_sigma', type=float, default=3.0)
 @click.option('--encoder', help='潜码编码器', type=str, required=True)
-def main(input_folder, output_folder, username, scale, center_sigma, xy_sigma, encoder):
+def main(**config):
+    _main(**config, config=config)
+
+
+def _main(input_folder, output_folder, username, scale, center_sigma, xy_sigma, encoder):
     logger_init(input_folder, output_folder, username, scale, encoder)
 
     config.name = username
@@ -103,6 +107,7 @@ def to_pil_image(tensor: torch.Tensor) -> Image.Image:
     x = x.detach().cpu().numpy()
     x = np.rint(x).clip(0, 255).astype(np.uint8)
     return Image.fromarray(x)
+
 
 if __name__ == '__main__':
     main()
