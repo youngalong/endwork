@@ -173,3 +173,16 @@ def crop_faces_by_quads(files, quads):
         orig_images.append(orig_image)
         crops.append(crop)
     return crops, orig_images
+
+
+def calc_alignment_coefficients(pa, pb):
+    matrix = []
+    for p1, p2 in zip(pa, pb):
+        matrix.append([p1[0], p1[1], 1, 0, 0, 0, -p2[0] * p1[0], -p2[0] * p1[1]])
+        matrix.append([0, 0, 0, p1[0], p1[1], 1, -p2[1] * p1[0], -p2[1] * p1[1]])
+
+    a = np.matrix(matrix, dtype=float)
+    b = np.array(pb).reshape(8)
+
+    res = np.dot(np.linalg.inv(a.T * a) * a.T, b)
+    return np.array(res).reshape(8)

@@ -4,6 +4,7 @@
 # @Author  : youngalone
 # @File    : utils.py
 # @Software: PyCharm
+import copy
 import pickle
 from argparse import Namespace
 
@@ -33,3 +34,10 @@ def load_g(file_path):
         old_g = pickle.load(f)['G_ema'].to(config.device).eval()
         old_g = old_g.float()
     return old_g
+
+
+def save_tuned_g(generator, pivots, quads, run_id):
+    generator = copy.deepcopy(generator).cpu()
+    pivots = copy.deepcopy(pivots).cpu()
+    torch.save({'generator': generator, 'pivots': pivots, 'quads': quads},
+               f'{config.checkpoints_dir}/model_{run_id}.pt')

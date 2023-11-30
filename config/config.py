@@ -9,7 +9,7 @@ import torch
 name = ""
 image_size = 1024
 device = "cuda:0" if torch.cuda.is_available else "cpu"
-checkpoints_dir = './checkpoints'
+checkpoints_dir = 'endwork/checkpoints'
 training_step = 1
 
 # 预训练模型
