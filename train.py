@@ -60,7 +60,7 @@ def _main(input_folder, output_folder, username, scale, center_sigma, xy_sigma, 
     ws = coach.train()
 
     # logger.info(ws.size())  # [5 * 18 * 512]
-    save_tuned_g(coach.G, ws, quads, config.name)
+    save_tuned_g(coach.G, ws, quads, configs.name)
 
     inverse_transforms = [
         calc_alignment_coefficients(quad + 0.5, [[0, 0], [0, image_size], [image_size, image_size], [image_size, 0]])
