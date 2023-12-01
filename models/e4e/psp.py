@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 
-from config.config import ir_se50_predictor_path
+from config.configs import ir_se50_predictor_path
 from models.e4e.encoders import psp_encoders
 from models.e4e.stylegan2.model import Generator
 

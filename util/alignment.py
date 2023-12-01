@@ -13,8 +13,8 @@ from PIL import Image
 from scipy.ndimage import gaussian_filter1d
 from tqdm import tqdm
 
-from config.config import image_size
-from config.config import shape_predictor_path
+from config.configs import image_size
+from config.configs import shape_predictor_path
 from util.logger import logger
 
 

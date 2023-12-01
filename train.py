@@ -14,8 +14,7 @@ from PIL import Image
 from torchvision import transforms
 from tqdm import tqdm
 
-from config import config
-from config.config import image_size
+from config.configs import image_size
 from dataset.my_dataset import MyDataset
 from models.utils import save_tuned_g
 from training.coach import Coach
@@ -37,7 +36,7 @@ def main(**config):
     _main(**config, config=config)
 
 
-def _main(input_folder, output_folder, username, scale, center_sigma, xy_sigma, encoder):
+def _main(input_folder, output_folder, username, scale, center_sigma, xy_sigma, encoder, config):
     logger_init(input_folder, output_folder, username, scale, encoder)
 
     config.name = username

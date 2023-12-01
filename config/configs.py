@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2023/11/15 23:18
 # @Author  : youngalone
-# @File    : config.py
+# @File    : configs.py
 # @Software: PyCharm
 import torch
 

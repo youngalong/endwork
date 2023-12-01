@@ -1,8 +1,9 @@
 import numpy as np
 import torch
 
-from config import config
-from config.config import regularizer_alpha, regularizer_l2_lambda, regularizer_lpips_lambda, latent_ball_num_of_samples
+from config import configs
+from config.configs import regularizer_alpha, regularizer_l2_lambda, regularizer_lpips_lambda, \
+    latent_ball_num_of_samples
 from criteria import l2_loss
 
 
@@ -28,7 +29,7 @@ class SpaceRegularizer:
         loss = 0.0
 
         z_samples = np.random.randn(num_of_sampled_latents, self.original_G.z_dim)
-        w_samples = self.original_G.mapping(torch.from_numpy(z_samples).to(config.device), None,
+        w_samples = self.original_G.mapping(torch.from_numpy(z_samples).to(configs.device), None,
                                             truncation_psi=0.5)
         territory_indicator_ws = [self.get_morphed_w_code(w_code.unsqueeze(0), w_batch) for w_code in w_samples]
 

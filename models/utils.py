@@ -10,8 +10,8 @@ from argparse import Namespace
 
 import torch
 
-from config import config
-from config.config import e4e_predictor_path, stylegan2_ada_ffhq_predictor_path
+from config import configs
+from config.configs import e4e_predictor_path, stylegan2_ada_ffhq_predictor_path
 from models.e4e.psp import pSp
 
 
@@ -21,7 +21,7 @@ def init_e4e():
     opts['checkpoint_path'] = e4e_predictor_path
     opts = Namespace(**opts)
     e4e_inversion_net = pSp(opts)
-    e4e_inversion_net = e4e_inversion_net.eval().to(config.device).requires_grad_(False)
+    e4e_inversion_net = e4e_inversion_net.eval().to(configs.device).requires_grad_(False)
     return e4e_inversion_net
 
 
@@ -31,7 +31,7 @@ def load_old_g():
 
 def load_g(file_path):
     with open(file_path, 'rb') as f:
-        old_g = pickle.load(f)['G_ema'].to(config.device).eval()
+        old_g = pickle.load(f)['G_ema'].to(configs.device).eval()
         old_g = old_g.float()
     return old_g
 
@@ -40,4 +40,4 @@ def save_tuned_g(generator, pivots, quads, run_id):
     generator = copy.deepcopy(generator).cpu()
     pivots = copy.deepcopy(pivots).cpu()
     torch.save({'generator': generator, 'pivots': pivots, 'quads': quads},
-               f'{config.checkpoints_dir}/model_{run_id}.pt')
+               f'{configs.checkpoints_dir}/model_{run_id}.pt')
