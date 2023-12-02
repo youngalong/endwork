@@ -29,6 +29,7 @@ def init_psp():
     ckpt = torch.load(psp_predictor_path, map_location='cpu')
     opts = ckpt['opts']
     opts['checkpoint_path'] = psp_predictor_path
+    opts['stylegan_size'] = 1024
     opts = Namespace(**opts)
     psp_inversion_net = pSp(opts)
     psp_inversion_net = psp_inversion_net.eval().to(configs.device).requires_grad_(False)
