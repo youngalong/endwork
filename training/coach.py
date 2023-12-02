@@ -17,7 +17,7 @@ from config import configs
 from config.configs import checkpoints_dir
 from criteria import l2_loss
 from criteria.localitly_regularizer import SpaceRegularizer
-from models.utils import init_e4e, load_old_g
+from models.utils import init_e4e, load_old_g, init_psp
 from util.logger import logger
 
 
@@ -30,9 +30,9 @@ class Coach:
         if self.encoder == 'e4e':
             self.encoder_net = init_e4e()
         elif self.encoder == 'pSp':
-            pass
+            self.encoder_net = init_psp()
 
-        self.e4e_image_transform = transforms.Resize((256, 256))
+        self.image_transform = transforms.Resize((256, 256))
         # 感知损失
         self.lpips_loss = LPIPS(net='alex').to(configs.device).eval()
 
@@ -95,28 +95,28 @@ class Coach:
 
                 configs.training_step += 1
 
-            log_dict = {}
-            for key, losses in step_loss_dict.items():
-                loss_mean = sum(losses) / len(losses)
-                loss_max = max(losses)
-                log_dict[f'losses_agg/{key}_mean'] = loss_mean
-                log_dict[f'losses_agg/{key}_max'] = loss_max
+            # log_dict = {}
+            # for key, losses in step_loss_dict.items():
+            #     loss_mean = sum(losses) / len(losses)
+            #     loss_max = max(losses)
+            #     log_dict[f'losses_agg/{key}_mean'] = loss_mean
+            #     log_dict[f'losses_agg/{key}_max'] = loss_max
 
         logger.info('训练完成')
         w_pivots = torch.cat(w_pivots)
         return w_pivots
 
     def get_inversion(self, image):
-        if self.encoder == 'e4e':
-            w_pivot = self.get_e4e_inversion(image)
+        if self.encoder == 'e4e' or self.encoder == 'psp':
+            w_pivot = self._get_inversion(image)
         else:
             pass
 
         w_pivot = w_pivot.to(configs.device)
         return w_pivot
 
-    def get_e4e_inversion(self, image):
-        new_image = self.e4e_image_transform(image).to(configs.device)
+    def _get_inversion(self, image):
+        new_image = self.image_transform(image).to(configs.device)
         _, w = self.encoder_net(new_image.unsqueeze(0), randomize_noise=False, return_latents=True, resize=False,
                                 input_code=False)
         return w
