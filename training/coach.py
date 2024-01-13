@@ -29,8 +29,10 @@ class Coach:
         # TODO
         if self.encoder == 'e4e':
             self.encoder_net = init_e4e()
-        elif self.encoder == 'pSp':
+        elif self.encoder == 'psp':
             self.encoder_net = init_psp()
+        else:
+            pass
 
         self.image_transform = transforms.Resize((256, 256))
         # 感知损失
