@@ -33,12 +33,13 @@ from util.logger import logger_init
 @click.option('--center_sigma', type=float, default=1.0)
 @click.option('--xy_sigma', type=float, default=3.0)
 @click.option('--encoder', help='潜码编码器', type=str, required=True)
+@click.option("--generator", help="生成器", type=str, required=True)
 def main(**config):
     _main(**config, config=config)
 
 
-def _main(input_folder, output_folder, username, scale, center_sigma, xy_sigma, encoder, config):
-    logger_init(input_folder, output_folder, username, scale, encoder)
+def _main(input_folder, output_folder, username, scale, center_sigma, xy_sigma, encoder, generator, config):
+    logger_init(input_folder, output_folder, username, scale, encoder, generator)
 
     configs.name = username
     files = make_dataset(input_folder)
@@ -55,7 +56,7 @@ def _main(input_folder, output_folder, username, scale, center_sigma, xy_sigma, 
         transforms.ToTensor(),
         transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
     ]))
-    coach = Coach(ds, encoder)
+    coach = Coach(ds, encoder, generator)
 
     ws = coach.train()
 

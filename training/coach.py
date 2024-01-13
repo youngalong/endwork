@@ -17,16 +17,17 @@ from config import configs
 from config.configs import checkpoints_dir
 from criteria import l2_loss
 from criteria.localitly_regularizer import SpaceRegularizer
-from models.utils import init_e4e, load_old_g, init_psp
+from models.utils import init_e4e, load_g, init_psp
 from util.logger import logger
 
 
 class Coach:
-    def __init__(self, dataset, encoder):
+    def __init__(self, dataset, encoder, generator):
         self.dataset = dataset
         self.encoder = encoder
+        self.generator = generator
 
-        # TODO
+        # TODO 补充 encoder+optimize 的方法
         if self.encoder == 'e4e':
             self.encoder_net = init_e4e()
         elif self.encoder == 'psp':
@@ -38,17 +39,17 @@ class Coach:
         # 感知损失
         self.lpips_loss = LPIPS(net='alex').to(configs.device).eval()
 
-        self.restart_training()
+        self.restart_training(generator)
 
         self.checkpoint_dir = checkpoints_dir
         os.makedirs(self.checkpoint_dir, exist_ok=True)
 
-    def restart_training(self):
+    def restart_training(self, generator):
         # Initialize networks
-        self.G = load_old_g()
+        self.G = load_g(generator)
         self.G.requires_grad_(True)
 
-        self.original_G = load_old_g()
+        self.original_G = load_g(generator)
 
         self.space_regularizer = SpaceRegularizer(self.original_G, self.lpips_loss)
         self.optimizer = self.configure_optimizers()

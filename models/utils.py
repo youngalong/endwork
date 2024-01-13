@@ -36,10 +36,6 @@ def init_psp():
     return psp_inversion_net
 
 
-def load_old_g():
-    return load_g(stylegan2_ada_ffhq_predictor_path)
-
-
 def load_g(file_path):
     with open(file_path, 'rb') as f:
         old_g = pickle.load(f)['G_ema'].to(configs.device).eval()
