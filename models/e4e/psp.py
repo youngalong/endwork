@@ -36,7 +36,7 @@ class pSp(nn.Module):
 
     def load_weights(self):
         if self.opts.checkpoint_path is not None:
-            print('Loading e4e over the pSp framework from checkpoint: {}'.format(self.opts.checkpoint_path))
+            print('Loading encoder from checkpoint: {}'.format(self.opts.checkpoint_path))
             ckpt = torch.load(self.opts.checkpoint_path, map_location='cpu')
             self.encoder.load_state_dict(get_keys(ckpt, 'encoder'), strict=True)
             self.decoder.load_state_dict(get_keys(ckpt, 'decoder'), strict=True)
