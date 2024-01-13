@@ -1,4 +1,4 @@
-# Copyright (c) 2021, NVIDIA CORPORATION.  All rights reserved.
+# Copyright (c) 2021, NVIDIA CORPORATION & AFFILIATES.  All rights reserved.
 #
 # NVIDIA CORPORATION and its licensors retain all intellectual property
 # and proprietary rights in and to this software, related documentation
@@ -47,7 +47,7 @@ class _FusedMultiplyAdd(torch.autograd.Function):  # a * b + c
         return da, db, dc
 
 
-# ----------------------------------------------------------------------------
+#----------------------------------------------------------------------------
 
 def _unbroadcast(x, shape):
     extra_dims = x.ndim - len(shape)
@@ -60,4 +60,4 @@ def _unbroadcast(x, shape):
     assert x.shape == shape
     return x
 
-# ----------------------------------------------------------------------------
+#----------------------------------------------------------------------------

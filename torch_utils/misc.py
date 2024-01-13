@@ -1,4 +1,4 @@
-﻿# Copyright (c) 2021, NVIDIA CORPORATION.  All rights reserved.
+# Copyright (c) 2021, NVIDIA CORPORATION & AFFILIATES.  All rights reserved.
 #
 # NVIDIA CORPORATION and its licensors retain all intellectual property
 # and proprietary rights in and to this software, related documentation
@@ -18,7 +18,6 @@ import dnnlib
 # same constant is used multiple times.
 
 _constant_cache = dict()
-
 
 def constant(value, shape=None, dtype=None, device=None, memory_format=None):
     value = np.asarray(value)
@@ -42,7 +41,7 @@ def constant(value, shape=None, dtype=None, device=None, memory_format=None):
     return tensor
 
 
-# ----------------------------------------------------------------------------
+#----------------------------------------------------------------------------
 # Replace NaN/Inf with specified numerical values.
 
 try:
@@ -57,7 +56,7 @@ except AttributeError:
         assert nan == 0
         return torch.clamp(input.unsqueeze(0).nansum(0), min=neginf, max=posinf, out=out)
 
-# ----------------------------------------------------------------------------
+#----------------------------------------------------------------------------
 # Symbolic assert.
 
 try:
@@ -67,16 +66,18 @@ except AttributeError:
 
 
 # ----------------------------------------------------------------------------
-# Context manager to suppress known warnings in torch.jit.trace().
+# Context manager to temporarily suppress known warnings in torch.jit.trace().
+# Note: Cannot use catch_warnings because of https://bugs.python.org/issue29672
 
-class suppress_tracer_warnings(warnings.catch_warnings):
-    def __enter__(self):
-        super().__enter__()
-        warnings.simplefilter('ignore', category=torch.jit.TracerWarning)
-        return self
+@contextlib.contextmanager
+def suppress_tracer_warnings():
+    flt = ('ignore', None, torch.jit.TracerWarning, None, 0)
+    warnings.filters.insert(0, flt)
+    yield
+    warnings.filters.remove(flt)
 
 
-# ----------------------------------------------------------------------------
+#----------------------------------------------------------------------------
 # Assert that the shape of a tensor matches the given list of integers.
 # None indicates that the size of a dimension is allowed to vary.
 # Performs symbolic assertion when used in torch.jit.trace().
@@ -98,19 +99,18 @@ def assert_shape(tensor, ref_shape):
             raise AssertionError(f'Wrong size for dimension {idx}: got {size}, expected {ref_size}')
 
 
-# ----------------------------------------------------------------------------
+#----------------------------------------------------------------------------
 # Function decorator that calls torch.autograd.profiler.record_function().
 
 def profiled_function(fn):
     def decorator(*args, **kwargs):
         with torch.autograd.profiler.record_function(fn.__name__):
             return fn(*args, **kwargs)
-
     decorator.__name__ = fn.__name__
     return decorator
 
 
-# ----------------------------------------------------------------------------
+#----------------------------------------------------------------------------
 # Sampler for torch.utils.data.DataLoader that loops over the dataset
 # indefinitely, shuffling items as it goes.
 
@@ -148,30 +148,28 @@ class InfiniteSampler(torch.utils.data.Sampler):
             idx += 1
 
 
-# ----------------------------------------------------------------------------
+#----------------------------------------------------------------------------
 # Utilities for operating with torch.nn.Module parameters and buffers.
 
 def params_and_buffers(module):
     assert isinstance(module, torch.nn.Module)
     return list(module.parameters()) + list(module.buffers())
 
-
 def named_params_and_buffers(module):
     assert isinstance(module, torch.nn.Module)
     return list(module.named_parameters()) + list(module.named_buffers())
 
-
 def copy_params_and_buffers(src_module, dst_module, require_all=False):
     assert isinstance(src_module, torch.nn.Module)
     assert isinstance(dst_module, torch.nn.Module)
-    src_tensors = {name: tensor for name, tensor in named_params_and_buffers(src_module)}
+    src_tensors = dict(named_params_and_buffers(src_module))
     for name, tensor in named_params_and_buffers(dst_module):
         assert (name in src_tensors) or (not require_all)
         if name in src_tensors:
             tensor.copy_(src_tensors[name].detach()).requires_grad_(tensor.requires_grad)
 
 
-# ----------------------------------------------------------------------------
+#----------------------------------------------------------------------------
 # Context manager for easily enabling/disabling DistributedDataParallel
 # synchronization.
 
@@ -185,7 +183,7 @@ def ddp_sync(module, sync):
             yield
 
 
-# ----------------------------------------------------------------------------
+#----------------------------------------------------------------------------
 # Check DistributedDataParallel consistency across processes.
 
 def check_ddp_consistency(module, ignore_regex=None):
@@ -195,12 +193,14 @@ def check_ddp_consistency(module, ignore_regex=None):
         if ignore_regex is not None and re.fullmatch(ignore_regex, fullname):
             continue
         tensor = tensor.detach()
+        if tensor.is_floating_point():
+            tensor = nan_to_num(tensor)
         other = tensor.clone()
         torch.distributed.broadcast(tensor=other, src=0)
-        assert (nan_to_num(tensor) == nan_to_num(other)).all(), fullname
+        assert (tensor == other).all(), fullname
 
 
-# ----------------------------------------------------------------------------
+#----------------------------------------------------------------------------
 # Print summary table of module hierarchy.
 
 def print_module_summary(module, inputs, max_nesting=3, skip_redundant=True):
@@ -211,17 +211,14 @@ def print_module_summary(module, inputs, max_nesting=3, skip_redundant=True):
     # Register hooks.
     entries = []
     nesting = [0]
-
     def pre_hook(_mod, _inputs):
         nesting[0] += 1
-
     def post_hook(mod, _inputs, outputs):
         nesting[0] -= 1
         if nesting[0] <= max_nesting:
             outputs = list(outputs) if isinstance(outputs, (tuple, list)) else [outputs]
             outputs = [t for t in outputs if isinstance(t, torch.Tensor)]
             entries.append(dnnlib.EasyDict(mod=mod, outputs=outputs))
-
     hooks = [mod.register_forward_pre_hook(pre_hook) for mod in module.modules()]
     hooks += [mod.register_forward_hook(post_hook) for mod in module.modules()]
 
@@ -252,7 +249,7 @@ def print_module_summary(module, inputs, max_nesting=3, skip_redundant=True):
         name = '<top-level>' if e.mod is module else submodule_names[e.mod]
         param_size = sum(t.numel() for t in e.unique_params)
         buffer_size = sum(t.numel() for t in e.unique_buffers)
-        output_shapes = [str(list(e.outputs[0].shape)) for t in e.outputs]
+        output_shapes = [str(list(t.shape)) for t in e.outputs]
         output_dtypes = [str(t.dtype).split('.')[-1] for t in e.outputs]
         rows += [[
             name + (':0' if len(e.outputs) >= 2 else ''),
@@ -276,4 +273,4 @@ def print_module_summary(module, inputs, max_nesting=3, skip_redundant=True):
     print()
     return outputs
 
-# ----------------------------------------------------------------------------
+#----------------------------------------------------------------------------

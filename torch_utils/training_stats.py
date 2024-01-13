@@ -1,4 +1,4 @@
-# Copyright (c) 2021, NVIDIA CORPORATION.  All rights reserved.
+# Copyright (c) 2021, NVIDIA CORPORATION & AFFILIATES.  All rights reserved.
 #
 # NVIDIA CORPORATION and its licensors retain all intellectual property
 # and proprietary rights in and to this software, related documentation
@@ -52,7 +52,7 @@ def init_multiprocessing(rank, sync_device):
     _sync_device = sync_device
 
 
-# ----------------------------------------------------------------------------
+#----------------------------------------------------------------------------
 
 @misc.profiled_function
 def report(name, value):
@@ -101,7 +101,7 @@ def report(name, value):
     return value
 
 
-# ----------------------------------------------------------------------------
+#----------------------------------------------------------------------------
 
 def report0(name, value):
     r"""Broadcasts the given set of scalars by the first process (`rank = 0`),
@@ -112,7 +112,7 @@ def report0(name, value):
     return value
 
 
-# ----------------------------------------------------------------------------
+#----------------------------------------------------------------------------
 
 class Collector:
     r"""Collects the scalars broadcasted by `report()` and `report0()` and
@@ -134,7 +134,6 @@ class Collector:
                         scalars were collected on a given round
                         (default: True).
     """
-
     def __init__(self, regex='.*', keep_previous=True):
         self._regex = re.compile(regex)
         self._keep_previous = keep_previous
@@ -235,7 +234,7 @@ class Collector:
         return self.mean(name)
 
 
-# ----------------------------------------------------------------------------
+#----------------------------------------------------------------------------
 
 def _sync(names):
     r"""Synchronize the global cumulative counters across devices and
@@ -271,4 +270,4 @@ def _sync(names):
     # Return name-value pairs.
     return [(name, _cumulative[name]) for name in names]
 
-# ----------------------------------------------------------------------------
+#----------------------------------------------------------------------------
